@@ -8,11 +8,8 @@ $func = $argv[1];
 
 $func2 = str_replace("_","-",$func); //function with "_" become "-"
 
-if(!function_exists($func)) die("Function \"".$func."\" does not exist");
-
-foreach(scandir($manual_path) as $value){
-
-}
+if(!in_array("function.".$func2.".html", scandir($manual_path)))
+	die("Function doesn't exist.");
 
 
 $php_net = file_get_contents($manual_path."function.".$func2.".html");
@@ -58,19 +55,19 @@ $ret = removeTags($ret_raw[1]);
 
 // ====== print things ======
 
-echo white("\nAvailable in ".$versions."\n");
+echo white("\n Available in ".$versions."\n");
 
 echo $description."\n";
 
-echo white("Definition:\n");
+echo white(" Definition:\n");
 
 echo "	".preg_replace("/resourcefalse/","resource false",yellow($definition))."\n";
 
-echo white("\nParameters:\n");
+echo white("\n Parameters:\n");
 for($i=0;$i<count($param_content_list);$i++){
 	echo "	".cyan($param_name_list[$i]);
 	$param = html_entity_decode(removeTags($param_content_list[$i]),ENT_QUOTES)."\n"; //remove tags
 	echo $param;
 }
 
-echo white("Return value:").preg_replace("/^ +/ms", "       ",$ret);
+echo white(" Return value:").preg_replace("/^ +/ms", "       ",$ret);
