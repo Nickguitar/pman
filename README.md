@@ -36,3 +36,5 @@ It returns:
 This is by far not the best code I could to, and I've made some quick fixes. I know the code isn't beaultiful.
 
 I haven't tested with a lot of functions and the PHP manual has some inconsistences, so it's possible that there is some bug.
+
+Oh, and since I made this to work with functions only, I deleted every html file that doesn't start with "function." on the folder at step 2
