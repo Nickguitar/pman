@@ -1,0 +1,76 @@
+#!/usr/bin/php
+<?php
+
+$manual_path = "/opt/pman/php-chunked-xhtml/";
+
+if(!isset($argv[1])) die("Usage: pman [function]");
+$func = $argv[1];
+
+$func2 = str_replace("_","-",$func); //function with "_" become "-"
+
+if(!function_exists($func)) die("Function \"".$func."\" does not exist");
+
+foreach(scandir($manual_path) as $value){
+
+}
+
+
+$php_net = file_get_contents($manual_path."function.".$func2.".html");
+$php_net = preg_replace("/(&nbsp;)+/", " ", $php_net);	//remove dummy spaces
+
+
+function removeTags($str){return preg_replace("/<[^>]*>/","",$str);$clean;}
+function white ($str){	return "\e[97m".$str."\e[0m";}
+function green ($str){	return "\e[92m".$str."\e[0m";}
+function yellow($str){	return "\e[93m".$str."\e[0m";}
+function cyan  ($str){	return "\e[96m".$str."\e[0m";}
+
+preg_match('/verinfo">\((.*)\)\<\/p\>/', $php_net, $output_array); //get version in which the function works
+$versions = preg_replace("/&gt;/",">",$output_array[1]);
+
+preg_match('/dc-title"\>(.*)\<\/span\>/', $php_net, $output_array); //get the definition of the function
+$description =  "	".green($func)." - ".white($output_array[1])."\n";
+
+preg_match('/methodname"\>(.*)\<\/span\>/', $php_net, $output_array); //definition
+$definition = removeTags($output_array[1]); 
+
+preg_match('/\<div class="refsect1 parameters" id=".*">(.*?)<div class="refsect1 returnvalues"/ms', $php_net, $output_array); //parameters description
+$param_desc_raw = $output_array[0];
+
+//parse lines to get each parameter
+$param_desc_arr = explode("\n", $param_desc_raw);
+$param_name_list = array();
+foreach($param_desc_arr as $line){
+	if(strpos($line, '<code class="parameter">') !== false){
+		preg_match('/<code class="parameter">(.*)<\/code>/',$line,$param_name); //get the name of each parameter
+		array_push($param_name_list, $param_name[1]);
+	}
+}
+
+preg_match_all('/<\/code><\/dt>.*?<p class="para">(.*?)<\/p>/ms',$param_desc_raw,$param_content); //get the description of each parameter
+$param_content_list = $param_content[1];
+
+$param_name_list = array_unique($param_name_list);	//remove duplicate
+$param_name_list = array_values($param_name_list); //reset array indexing
+
+preg_match('/<h3 class="title">Return Values<\/h3>.*?<p class="para">(.*?)<\/p>/ms',$php_net,$ret_raw);
+$ret = removeTags($ret_raw[1]);
+
+// ====== print things ======
+
+echo white("\nAvailable in ".$versions."\n");
+
+echo $description."\n";
+
+echo white("Definition:\n");
+
+echo "	".preg_replace("/resourcefalse/","resource false",yellow($definition))."\n";
+
+echo white("\nParameters:\n");
+for($i=0;$i<count($param_content_list);$i++){
+	echo "	".cyan($param_name_list[$i]);
+	$param = html_entity_decode(removeTags($param_content_list[$i]),ENT_QUOTES)."\n"; //remove tags
+	echo $param;
+}
+
+echo white("Return value:").preg_replace("/^ +/ms", "       ",$ret);
