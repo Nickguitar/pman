@@ -31,3 +31,8 @@ It returns:
 4. Make pman executable with `chmod +x pman`
 
 **Tip:** use `# mv pman /bin` to call it from anywhere
+
+### Note
+This is by far not the best code I could to, and I've made some quick fixes. I know the code isn't beaultiful.
+
+I haven't tested with a lot of functions and the PHP manual has some inconsistences, so it's possible that there is some bug.
